@@ -1,0 +1,39 @@
+version: "3.8"
+
+services:
+  db:
+    build: ./database
+    container_name: postgres-container
+    restart: always
+    environment:
+      POSTGRES_DB: mydb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - mynetwork
+
+  backend:
+    build: ./backend
+    container_name: backend-container
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      DB_HOST: db
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: mydb
+      DB_PORT: 5432
+    depends_on:
+      - db
+    networks:
+      - mynetwork
+
+volumes:
+  postgres_data:
+
+networks:
+  mynetwork:
+    driver: bridge
